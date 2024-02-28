@@ -28,16 +28,28 @@ class Book(models.Model):
     cover_photo = models.ImageField(
         upload_to='images/books/', blank=True, null=True)
     popularity = models.IntegerField(default=0)
-    iso = models.CharField(max_length=100, blank=True, null=True)
     description = models.TextField(default='')
     number_copies = models.IntegerField(default=0)
     view_count = models.IntegerField(default=0)
     year = models.PositiveIntegerField(
         default=current_year(), validators=[MinValueValidator(1984), max_value_current_year])
-    tags = models.ManyToManyField(Tags, null=True, blank=True)
+    tags = models.ManyToManyField(Tags, blank=True)
+    isbn_issn = models.CharField("ISBN/ISSN", max_length=50)
+    ddc_number = models.CharField("DDC No.", max_length=50)
+    edition_statement = models.CharField("Edition Statement", max_length=250)
+    publisher = models.CharField(max_length=80)
+    physical_description = models.TextField(
+        "Physical Description")
+    general_information = models.TextField("General Information", default='')
+    discipline = models.CharField(max_length=80, null=True, blank=True)
+    imprint = models.CharField(max_length=50, null=True, blank=True)
+    control_number = models.CharField(
+        "Control No.", max_length=50, null=True, blank=True)
+    call_number = models.CharField(
+        "Call No.", max_length=50, null=True, blank=True)
 
     def __str__(self) -> str:
-        return self.title + " " + self.title
+        return self.title + " " + self.author
 
 
 class BookPhotos(models.Model):

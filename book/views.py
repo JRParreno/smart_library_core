@@ -1,5 +1,8 @@
-from rest_framework import generics, permissions, response, status
-from django_filters import rest_framework as filters
+from functools import reduce
+from operator import or_
+from rest_framework import generics, permissions, response, status, filters
+import django_filters.rest_framework
+from django_filters.rest_framework import DjangoFilterBackend
 
 from .serializers import BookSerializer
 from .models import Book
@@ -12,9 +15,13 @@ class BookListView(generics.ListAPIView):
     permission_classes = []
     queryset = Book.objects.all().order_by('-popularity')
     pagination_class = ExtraSmallResultsSetPagination
-    # filter_backends = (filters.DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
 
-    # def get_queryset(self):
-    #     tags = self.request.query_params.getlist('tags', None)
-    #     print(tags)
-    #     return Book.objects.filter(tags__acronym__in=tags).order_by('-popularity')
+    def get_queryset(self):
+        tags = self.request.query_params.get('tags', None)
+        if tags:
+            myTags = tags.split(',')
+            q_object = reduce(or_, (Q(tags__acronym__icontains=tag)
+                              for tag in myTags))
+            return Book.objects.filter(q_object).order_by('-popularity').distinct()
+        return super().get_queryset()

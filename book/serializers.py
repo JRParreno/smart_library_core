@@ -16,9 +16,12 @@ class BookSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Book
-        fields = ['pk', 'department', 'title', 'popularity', 'cover_photo',
-                  'description', 'number_copies', 'view_count', 'year', 'author',
-                  'tags',
+        fields = ['pk', 'department', 'title', 'author', 'popularity', 'cover_photo',
+                  'description', 'number_copies', 'view_count', 'year',
+                  'tags', 'isbn_issn', 'ddc_number', 'edition_statement',
+                  'publisher', 'imprint', 'physical_description',
+                  'control_number', 'call_number', 'general_information',
+                  'discipline'
                   ]
 
     def __init__(self, *args, **kwargs):
