@@ -12,7 +12,13 @@
             "args": [
                 "runserver",
             ],
-            "django": true
+            "django": true,
+            "env": {
+                "EMAIL_HOST_USER": "smartlib24@gmail.com",
+                "DEFAULT_FROM_EMAIL": "smartlib24@gmail.com",
+                "EMAIL_HOST_PASSWORD": "syajskjdqlixskqt",
+                "DATABASE_URL": "postgres://smart_library_db_user:83FUo6CCvZBLTQW7F1NO72fCxrf0L4M4@dpg-cnflstdjm4es73eoj0ng-a.oregon-postgres.render.com/smart_library_db"
+            }
         }
     ]
 }
