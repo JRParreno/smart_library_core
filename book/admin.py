@@ -17,4 +17,4 @@ class BookAdminView(admin.ModelAdmin):
     search_fields = ('title',)
     list_display = ('title',)
     inlines = [ShopPhotoTabularInLine,]
-    filter_horizontal = ['tags']
+    filter_horizontal = ['tags',]
