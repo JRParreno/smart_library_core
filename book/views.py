@@ -40,6 +40,13 @@ class BookEventsView(generics.CreateAPIView):
             return response.Response(error, status=status.HTTP_400_BAD_REQUEST)
 
         book = serializer.validated_data['book']
+
+        if self.request.user.is_anonymous:
+            error = {
+                "error_message": "User is anonymouse"
+            }
+            return response.Response(error, status=status.HTTP_200_OK)
+
         is_exists = BookViewCount.objects.filter(
             user=self.request.user, book__pk=book.pk).exists()
         if is_exists:
@@ -68,14 +75,6 @@ class BookRateView(viewsets.ViewSet):
 
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
-        user = self.request.user
-        user_exists = BookRate.objects.filter(user__pk=user.pk).exists()
-
-        if user_exists:
-            error = {
-                "error_message": "You already rate this book."
-            }
-            return response.Response(error, status=status.HTTP_400_BAD_REQUEST)
 
         if not serializer.is_valid():
             error = {
@@ -83,7 +82,19 @@ class BookRateView(viewsets.ViewSet):
             }
             return response.Response(error, status=status.HTTP_400_BAD_REQUEST)
 
+        user = self.request.user
+        book = serializer.validated_data['book']
+        user_exists = BookRate.objects.filter(
+            user__pk=user.pk, book__pk=book.pk).exists()
+
+        if user_exists:
+            error = {
+                "error_message": "You already rate this book."
+            }
+            return response.Response(error, status=status.HTTP_400_BAD_REQUEST)
+
         serializer.validated_data['user'] = self.request.user
+        serializer.save()
 
         message = {
             "success_message": "You rate this book!"

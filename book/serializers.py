@@ -40,6 +40,13 @@ class BookSerializer(serializers.ModelSerializer):
         if 'request' in self.context and self.request:
             current_user = self.request.user
             book = data['pk']
+            is_rate = False
+            rate_pk = None
+            rate = 0
+            is_save = False
+            save_pk = None
+            view_count = 0
+
             # get book photos
             book_photos = BookPhotos.objects.filter(book__pk=book)
             book_object_photos = []
@@ -55,23 +62,29 @@ class BookSerializer(serializers.ModelSerializer):
             total_sum = book_rates.aggregate(Sum('rate'))
             total_rate = total_sum['rate__sum'] / \
                 book_rates.count() if book_rates.count() > 0 else 0.0
-            user_rate = BookRate.objects.filter(
-                user__pk=current_user.pk, book__pk=book)
-            save_books = BookSaved.objects.filter(
-                book__pk=book, user__pk=current_user.pk)
-            view_count = BookViewCount.objects.filter(
-                book__pk=book).count()
+
+            if not current_user.is_anonymous:
+                user_rate = BookRate.objects.filter(
+                    user__pk=current_user.pk, book__pk=book)
+                save_books = BookSaved.objects.filter(
+                    book__pk=book, user__pk=current_user.pk)
+                view_count = BookViewCount.objects.filter(
+                    book__pk=book).count()
+                is_rate = user_rate.exists()
+                rate_pk = user_rate.first(
+                ).pk if user_rate.exists() else None
+                rate = user_rate.first().rate if user_rate.exists() else 0
+                is_save = save_books.exists()
+                save_pk = save_books.first(
+                ).pk if save_books.exists() else None
 
             data['total_rate'] = total_rate
+            data['is_rate'] = is_rate
+            data['rate_pk'] = rate_pk
+            data['rate'] = rate
+            data['is_save'] = is_save
+            data['save_pk'] = save_pk
             data['view_count'] = view_count
-            data['is_rate'] = user_rate.exists()
-            data['rate_pk'] = user_rate.first(
-            ).pk if user_rate.exists() else None
-            data['is_save'] = save_books.exists()
-            data['save_pk'] = save_books.first(
-            ).pk if save_books.exists() else None
-            data['rate'] = user_rate.first().rate if user_rate.exists() else 0
-
         return data
 
 
@@ -79,7 +92,7 @@ class BookRateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BookRate
-        fields = ['book', 'rate']
+        fields = ['pk', 'book', 'rate']
 
 
 class BookSavedSerializer(serializers.ModelSerializer):
