@@ -53,7 +53,8 @@ class BookSerializer(serializers.ModelSerializer):
             book_rates = BookRate.objects.filter(
                 book__pk=book)
             total_sum = book_rates.aggregate(Sum('rate'))
-            total_rate = total_sum['rate__sum'] / book_rates.count()
+            total_rate = total_sum['rate__sum'] / \
+                book_rates.count() if book_rates.count() > 0 else 0
             user_rate = BookRate.objects.filter(
                 user__pk=current_user.pk, book__pk=book)
             save_books = BookSaved.objects.filter(
