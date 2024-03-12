@@ -3,6 +3,8 @@ from django.db import models
 from department.models import Department
 from django.core.validators import MaxValueValidator, MinValueValidator
 
+from django.contrib.auth.models import User
+
 
 def current_year():
     return datetime.date.today().year
@@ -30,7 +32,6 @@ class Book(models.Model):
     popularity = models.IntegerField(default=0)
     description = models.TextField(default='')
     number_copies = models.IntegerField(default=0)
-    view_count = models.IntegerField(default=0)
     year = models.PositiveIntegerField(
         default=current_year(), validators=[MinValueValidator(1984), max_value_current_year])
     tags = models.ManyToManyField(Tags, blank=True)
@@ -57,3 +58,46 @@ class BookPhotos(models.Model):
         Book, related_name='book_photos', on_delete=models.CASCADE)
     image = models.ImageField(
         upload_to='shop-pictures/', blank=True, null=True)
+
+
+class BookRate(models.Model):
+    class Meta:
+        unique_together = ['book', 'user']
+
+    user = models.ForeignKey(
+        User, related_name='user_rate', on_delete=models.CASCADE)
+
+    book = models.ForeignKey(
+        Book, related_name='book_rate', on_delete=models.CASCADE)
+    rate = models.IntegerField(default=0, validators=[MinValueValidator(0),
+                                                      MaxValueValidator(5)])
+
+    def __str__(self) -> str:
+        return self.book.title + " - " + str(self.rate)
+
+
+class BookSaved(models.Model):
+    class Meta:
+        unique_together = ['book', 'user']
+
+    user = models.ForeignKey(
+        User, related_name='user_book_save', on_delete=models.CASCADE)
+
+    book = models.ForeignKey(
+        Book, related_name='book_book_save', on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return self.book.title
+
+
+class BookViewCount(models.Model):
+    class Meta:
+        unique_together = ['book', 'user']
+
+    user = models.ForeignKey(
+        User, related_name='user_book_view_count', on_delete=models.CASCADE)
+
+    book = models.ForeignKey(
+        Book, related_name='book_book_view_count', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
