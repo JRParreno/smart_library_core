@@ -9,6 +9,7 @@ from .serializers import BookSerializer, BookRateSerializer, BookSavedSerializer
 from .models import Book, BookRate, BookSaved, BookViewCount
 from .paginate import ExtraSmallResultsSetPagination
 from django.db.models import Q, F
+from itertools import chain
 
 
 class BookListView(generics.ListAPIView):
@@ -17,6 +18,22 @@ class BookListView(generics.ListAPIView):
     queryset = Book.objects.all().order_by('-popularity')
     pagination_class = ExtraSmallResultsSetPagination
     filter_backends = [BookCustomSearchFilter]
+
+
+class BookRateListView(generics.ListAPIView):
+    serializer_class = BookSerializer
+    permission_classes = []
+    queryset = Book.objects.all().order_by('-popularity')
+    pagination_class = ExtraSmallResultsSetPagination
+    filter_backends = [BookCustomSearchFilter]
+
+    def get_queryset(self):
+        queryset = []
+
+        q = self.request.GET.get('q', None)
+        book_rates = BookRate.objects.filter(rate=q).values('book_id')
+        books = Book.objects.filter(pk__in=book_rates)
+        return books
 
 
 class BookDetailView(generics.RetrieveAPIView):

@@ -7,7 +7,8 @@ from user_profile.views import (ProfileView,
 
 from department.views import DepartmentListView
 from book.views import (BookListView, BookSavedListView, BookSavedDeleteView,
-                        BookRateView, BookEventsView, BookDetailView, BookSavedCreateView)
+                        BookRateView, BookEventsView, BookDetailView, BookSavedCreateView,
+                        BookRateListView)
 
 app_name = 'api'
 
@@ -41,6 +42,7 @@ urlpatterns = [
          name='book-saved-create'),
     path('book-saved-delete/<pk>', BookSavedDeleteView.as_view(),
          name='book-saved-delete'),
+    path('book-rate-filter', BookRateListView.as_view(), name='book-rate'),
 ]
 
 urlpatterns += router.urls
