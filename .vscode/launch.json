@@ -16,7 +16,7 @@
             "env": {
                 "EMAIL_HOST_USER": "smartlib24@gmail.com",
                 "DEFAULT_FROM_EMAIL": "smartlib24@gmail.com",
-                "EMAIL_HOST_PASSWORD": "syajskjdqlixskqt",
+                "EMAIL_HOST_PASSWORD": "lfeaocitwbcucamm",
                 "DATABASE_URL": "postgres://smart_library_db_6jdk_user:24gITqhmBOtXRf8XTmcxdvxcyciLmjd6@dpg-cnhvhoi1hbls73fen6k0-a.oregon-postgres.render.com/smart_library_db_6jdk",
                 "DEBUG": "False",
             }
