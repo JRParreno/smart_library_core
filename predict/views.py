@@ -10,35 +10,12 @@ from sklearn.preprocessing import MultiLabelBinarizer
 import numpy as np
 
 
-def f1_multilabel(y_true, y_pred):
-    """
-    Calculate the F1 score for multi-label classification.
-
-    Parameters:
-    y_true : list of lists
-        True labels for each sample.
-    y_pred : list of lists
-        Predicted labels for each sample.
-
-    Returns:
-    float
-        Weighted F1 score.
-    """
-    # Flatten the true and predicted labels
-    y_true_flat = [label for sublist in y_true for label in sublist]
-    y_pred_flat = [label for sublist in y_pred for label in sublist]
-
-    # Calculate the F1 score
-    f1 = f1_score(y_true_flat, y_pred_flat, average='weighted')
-
-    return f1
-
-
-def write_metrics_to_csv(accuracy, TP, FP, TN, FN, f1_score, csv_filename):
+def write_metrics_to_csv(accuracy, TP, FP, TN, FN, f1_score, csv_filename, param):
 
     # Create the CSV data
     csv_data = [
         ['Metric', 'Value'],
+        ['Tag Name', param],
         ['Subset Accuracy', accuracy],
         ['True Positives (TP)', TP],
         ['False Positives (FP)', FP],
@@ -62,7 +39,7 @@ def write_metrics_to_csv(accuracy, TP, FP, TN, FN, f1_score, csv_filename):
     return response
 
 
-def subset_accuracy_with_metrics(y_true, y_pred):
+def subset_accuracy_with_metrics(y_true, y_pred, params):
     """
     Calculate subset accuracy along with other metrics (TP, FP, TN, FN, F1 Score).
 
@@ -105,7 +82,7 @@ def subset_accuracy_with_metrics(y_true, y_pred):
     # Calculate subset accuracy
     accuracy = (TP + TN) / (TP + TN + FP + FN)
 
-    return write_metrics_to_csv(accuracy, TP, FP, TN, FN, f1, "f1_score.csv")
+    return write_metrics_to_csv(accuracy, TP, FP, TN, FN, f1, "f1_score.csv", params)
 
 
 def generate_predictions(book):
@@ -149,15 +126,11 @@ def subset_accuracy(y_true, y_pred):
 
 
 def prediction_view(request):
-    # # Create the HttpResponse object with the appropriate CSV header.
-    # response = HttpResponse(
-    #     content_type="text/csv",
-    #     headers={"Content-Disposition": 'attachment; filename="somefilename.csv"'},
-    # )
+    tag_name = request.GET.get('tag-name')
 
     # Fetch true ratings, tags, and genres for each book
     book_data = []
-    for book in Book.objects.all():
+    for book in Book.objects.filter(tags__name__icontains=tag_name):
         # Retrieve ratings from BookRate model related to the current book
         ratings = BookRate.objects.filter(
             book=book).values_list('rate', flat=True)
@@ -185,7 +158,7 @@ def prediction_view(request):
     # Combine predicted ratings and tags for each book into a list of tuples
     # Fetch books and generate predictions for each book
     pred_data = []
-    for book in Book.objects.filter(tags__name__icontains='alge'):
+    for book in Book.objects.filter(tags__name__icontains=tag_name):
         # Generate predictions for the current book
         predicted_rating, predicted_tags = generate_predictions(book)
         pred_data.append((predicted_rating, predicted_tags))
@@ -203,8 +176,6 @@ def prediction_view(request):
         true_ratings + true_tags, pred_ratings + pred_tags)
     print("Subset accuracy:", accuracy)
 
-    f1 = f1_multilabel(true_ratings + true_tags, pred_ratings +
-                       pred_tags)
     return subset_accuracy_with_metrics(true_ratings + true_tags, pred_ratings +
-                                        pred_tags)
+                                        pred_tags, tag_name)
     # return HttpResponse({"test": "sample"}, content_type="application/json")
