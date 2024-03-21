@@ -48,6 +48,7 @@ class Book(models.Model):
         "Control No.", max_length=50, null=True, blank=True)
     call_number = models.CharField(
         "Call No.", max_length=50, null=True, blank=True)
+    predicted_tags = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self) -> str:
         return self.title + " " + self.author

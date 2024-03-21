@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'user_profile',
     'course',
     'api',
+    'predict',
 
     'oauth2_provider',
     'rest_framework_swagger',

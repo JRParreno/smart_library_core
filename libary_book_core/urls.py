@@ -25,6 +25,8 @@ from rest_framework import permissions
 from django.contrib.auth import views as auth_views
 from rest_framework.routers import DefaultRouter
 from django.conf import settings
+
+from predict.views import prediction_view
 from .views import TokenViewWithUserId
 
 schema_view = get_schema_view(
@@ -54,6 +56,7 @@ urlpatterns = [
          auth_views.PasswordResetCompleteView.as_view(
              template_name='password_reset_complete.html'),
          name='password_reset_complete'),
+    path('book-prediction', prediction_view, name='prediction'),
 ]
 
 urlpatterns += router.urls
