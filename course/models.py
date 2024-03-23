@@ -8,5 +8,9 @@ class Course(models.Model):
     name = models.CharField(max_length=250)
     acronym = models.CharField(max_length=50)
 
+    class Meta:
+        verbose_name = 'Program'
+        verbose_name_plural = 'Programs'
+
     def __str__(self) -> str:
         return self.acronym + " " + self.name

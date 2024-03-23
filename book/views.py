@@ -10,6 +10,7 @@ from .models import Book, BookRate, BookSaved, BookViewCount
 from .paginate import ExtraSmallResultsSetPagination
 from django.db.models import Q, F
 from itertools import chain
+from django.db.models import Sum
 
 
 class BookListView(generics.ListAPIView):
@@ -112,6 +113,16 @@ class BookRateView(viewsets.ViewSet):
 
         serializer.validated_data['user'] = self.request.user
         serializer.save()
+        # newly created book-rate
+        current_book = get_object_or_404(Book, pk=book.pk)
+        book_rates = BookRate.objects.filter(
+            book__pk=current_book.pk)
+
+        total_sum = book_rates.aggregate(Sum('rate'))
+        total_rate = total_sum['rate__sum'] / \
+            book_rates.count() if book_rates.count() > 0 else 0.0
+        current_book.rate = total_rate
+        current_book.save()
 
         message = {
             "success_message": "You rate this book!"
