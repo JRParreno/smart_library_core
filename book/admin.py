@@ -22,6 +22,7 @@ class BookAdminView(admin.ModelAdmin):
     list_display = ('title', 'author', 'publisher', 'popularity', 'rate')
     inlines = [ShopPhotoTabularInLine,]
     filter_horizontal = ['tags',]
+    list_filter = ['department', 'year_level', 'semester']
 
 
 # @admin.register(BookRate)

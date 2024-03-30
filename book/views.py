@@ -16,7 +16,7 @@ from django.db.models import Sum
 class BookListView(generics.ListAPIView):
     serializer_class = BookSerializer
     permission_classes = []
-    queryset = Book.objects.all().order_by('-popularity')
+    queryset = Book.objects.all().order_by('-popularity', '-rate')
     pagination_class = ExtraSmallResultsSetPagination
     filter_backends = [BookCustomSearchFilter]
 
