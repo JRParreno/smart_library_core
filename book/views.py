@@ -121,7 +121,7 @@ class BookRateView(viewsets.ViewSet):
         total_sum = book_rates.aggregate(Sum('rate'))
         total_rate = total_sum['rate__sum'] / \
             book_rates.count() if book_rates.count() > 0 else 0.0
-        current_book.rate = total_rate
+        current_book.rate = round(total_rate, 2)
         current_book.save()
 
         message = {
@@ -141,6 +141,19 @@ class BookRateView(viewsets.ViewSet):
             instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+
+        current_book = get_object_or_404(Book, pk=instance.book.pk)
+
+        book_rates = BookRate.objects.filter(
+            book__pk=instance.book.pk)
+
+        total_sum = book_rates.aggregate(Sum('rate'))
+        total_rate = total_sum['rate__sum'] / \
+            book_rates.count() if book_rates.count() > 0 else 0.0
+
+        current_book.rate = round(total_rate, 2)
+        current_book.save()
+
         return response.Response(serializer.data)
 
     def destroy(self, request, pk=None):
