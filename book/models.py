@@ -42,9 +42,9 @@ class Book(models.Model):
     department = models.ForeignKey(
         Department, related_name='department_books', on_delete=models.CASCADE)
     year_level = models.CharField(
-        max_length=15, choices=YEAR_LEVELS, default='FIRST')
+        max_length=15, choices=YEAR_LEVELS, default='FIRST_YEAR')
     semester = models.CharField(
-        max_length=15, choices=SEMESTER, default='FIRST')
+        max_length=15, choices=SEMESTER, default='FIRST_SEM')
     title = models.CharField(max_length=255)
     author = models.CharField(max_length=100, default='')
     cover_photo = models.ImageField(
